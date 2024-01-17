@@ -4,6 +4,9 @@
 import * as THREE from 'three';
 // 导入轨道控制器
 import { OrbitControls} from "three/examples/jsm/controls/OrbitControls";
+// 导入GUI
+import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
+
 
 onMounted (()=>{
   // 创建场景
@@ -31,6 +34,8 @@ onMounted (()=>{
   // 创建材质
   const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
   const parentMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+  // 设置父元素材质为线框材质
+  parentMaterial.wireframe = true
   // 创建网格
   const cube = new THREE.Mesh(geometry, material);
   const parentCube =  new THREE.Mesh(geometry, parentMaterial);
@@ -83,8 +88,69 @@ onMounted (()=>{
     camera.updateProjectionMatrix()
   })
 
-  // 全屏
-  renderer.domElement.requestFullscreen()
+  // // 全屏按钮
+  // const btn = document.createElement('button')
+  // btn.innerText = '全屏'
+  // btn.style.position = 'absolute'
+  // btn.style.top = '10px'
+  // btn.style.left = '10px'
+  //
+  // document.body.appendChild(btn)
+  // btn.onclick = () => {
+  //   // body全屏
+  //   document.body.requestFullscreen()
+  //   // 画布的全屏
+  //   // renderer.domElement.requestFullscreen()
+  // }
+  //
+  // // 退出全屏按钮
+  // const exitBtn = document.createElement('button')
+  // exitBtn.innerText = '退出全屏'
+  // exitBtn.style.position = 'absolute'
+  // exitBtn.style.top = '10px'
+  // exitBtn.style.left = '60px'
+  // document.body.appendChild(exitBtn)
+  // exitBtn.onclick = () => {
+  //   // 退出全屏
+  //   document.exitFullscreen()
+  // }
+  let eventObj = {
+    FullScreen: function () {
+      // body全屏
+      document.body.requestFullscreen()
+      // 画布的全屏
+      // renderer.domElement.requestFullscreen()
+    },
+    ExitFullScreen: function () {
+      // 退出全屏
+      document.exitFullscreen()
+    }
+  }
+
+  // 创建GUI
+  const gui = new GUI()
+  // 添加按钮
+  gui.add(eventObj, 'FullScreen').name('全屏')
+  gui.add(eventObj, 'ExitFullScreen').name('退出全屏')
+
+  // 创建文件夹
+  const folder = gui.addFolder('立方体')
+  folder.add(cube.position, 'x').min(-3).max(3).step(0.01).name('立方体x轴位置').onChange((val)=>{
+    console.log(val)
+  })
+  folder.add(cube.position, 'y').min(-3).max(3).step(0.01).name('立方体x轴位置').onFinishChange((val)=>{
+    console.log(val)
+  })
+  folder.add(cube.position, 'z').min(-3).max(3).step(0.01).name('立方体x轴位置')
+
+  gui.add(parentMaterial, 'wireframe').name('父元素线框')
+
+  const colorObj = {
+    cubeColor: '#00ff00'
+  }
+  gui.addColor(colorObj, 'cubeColor').name('立方体颜色').onChange((val)=>{
+    cube.material.color.set(val)
+  })
 
 })
 
