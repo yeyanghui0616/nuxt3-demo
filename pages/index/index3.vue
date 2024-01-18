@@ -93,11 +93,6 @@ onMounted (()=>{
   // 加载纹理
   const texture = textureLoader.load('/textures/Material_2068.webp');
 
-  // 设置纹理的彩色空间
-  texture.colorSpace = THREE.SRGBColorSpace
-  // texture.colorSpace = THREE.LinearSRGBColorSpace
-  // texture.colorSpace = THREE.NoColorSpace  (默认线性空间)
-
   // 加载ao 环境遮挡贴图
   const aoTexture = textureLoader.load('/textures/Material_2073.webp');
 
@@ -137,13 +132,6 @@ onMounted (()=>{
   scene.add( plane );
 
   gui.add(planeMaterial, 'aoMapIntensity').min(0).max(1).name('ao强度')
-
-  gui.add(texture, 'colorSpace',{
-    sRGB: THREE.SRGBColorSpace,
-    Linear: THREE.LinearSRGBColorSpace
-  }).onChange(()=>{
-    texture.needsUpdate = true
-  })
 })
 
 
