@@ -44,7 +44,7 @@ onMounted (()=>{
 
 
   // 设置相机位置
-  camera.position.z = 15;
+  camera.position.z = 10;
   camera.position.x = 0
   camera.position.y = 0
   camera.lookAt(0,0,0)
@@ -89,64 +89,35 @@ onMounted (()=>{
   gui.add(eventObj, 'ExitFullScreen').name('退出全屏')
 
 
-  // 创建三个球
-  const sphere1 = new THREE.Mesh(
-      new THREE.SphereGeometry(1,32,32),
-      new THREE.MeshBasicMaterial({
-        color: 0x00ff00
-      })
-  )
-  sphere1.position.x = 4
-  scene.add(sphere1)
-  // 创建三个球
-  const sphere2 = new THREE.Mesh(
-      new THREE.SphereGeometry(1,32,32),
-      new THREE.MeshBasicMaterial({
-        color: 0x000ff0
-      })
-  )
-  sphere2.position.x = 0
-  scene.add(sphere2)
-  // 创建三个球
-  const sphere3 = new THREE.Mesh(
-      new THREE.SphereGeometry(1,32,32),
-      new THREE.MeshBasicMaterial({
-        color: 0x0ff0f0
-      })
-  )
-  sphere2.position.x = -4
-  scene.add(sphere3)
-
-  // 创建射线
-  const raycaster = new THREE.Raycaster()
-
-  // 创建鼠标向量，保存鼠标点在了画布的哪个位置上
-  const mouse = new THREE.Vector2()
-
-  window.addEventListener('click',(event)=>{
-    // 转化鼠标向量的x和y
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1
-    mouse.y = -(event.clientY/ window.innerHeight) * 2 + 1
-    console.log("%c ---> mouse.x, mouse.y: ","color:#F0F;", mouse.x, mouse.y);
-
-    // 通过摄像机和鼠标位置更新射线
-    raycaster.setFromCamera(mouse, camera)
-
-    // 计算射线与物体的焦点
-    const intersects = raycaster.intersectObjects([sphere1,sphere2,sphere3])
-    if(intersects.length>0){
-      if(intersects[0].object._isSelected){
-        intersects[0].object.material.color.set(intersects[0].object._originColor)
-        intersects[0].object._isSelected = false
-        return
-      }
-
-      console.log("%c ---> intersects: ","color:#F0F;", intersects);
-      intersects[0].object._isSelected = true
-      intersects[0].object._originColor = intersects[0].object.material.color.getHex()
-      intersects[0].object.material.color.set(0xff0000)
-    }
+  // 实例化加载器gltf
+  const gltfLoader = new GLTFLoader()
+  gltfLoader.load('/textures/tiny_city_4k.glb', (gltf)=>{
+    console.log("%c ---> gltf: ","color:#F0F;", gltf);
+    scene.add(gltf.scene)
+    // scene.background = new THREE.Color(0x999999)
   })
+
+  // // 实例化解析器
+  // const dracoLoader = new DRACOLoader()
+  // dracoLoader.setDecoderPath('./draco/')
+  //
+  // gltfLoader.setDRACOLoader(dracoLoader)
+  //
+  gltfLoader.load('/textures/雕塑11 (1).gltf', (gltf)=>{
+    console.log("%c ---> gltf: ","color:#F0F;", gltf);
+    scene.add(gltf.scene)
+    // scene.background = new THREE.Color(0x999999)
+  })
+
+  // 加载环境贴图
+  const rgbeLoader = new RGBELoader()
+  rgbeLoader.load('/textures/small_empty_room_1_1k.hdr', (envMap)=>{
+    // 球面的全景图映射
+    envMap.mapping = THREE.EquirectangularReflectionMapping
+    // 设置环境贴图
+    scene.environment = envMap
+  })
+
 })
 
 
