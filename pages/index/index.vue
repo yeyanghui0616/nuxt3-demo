@@ -86,64 +86,19 @@ onMounted (()=>{
   // 添加按钮
   gui.add(eventObj, 'FullScreen').name('全屏')
   gui.add(eventObj, 'ExitFullScreen').name('退出全屏')
+  // 创建长方体
+  const boxGeometry = new THREE.BoxGeometry(1,1,100)
+  const boxMeterial = new THREE.MeshBasicMaterial({color: 0x00ff00})
+  const box = new THREE.Mesh(boxGeometry, boxMeterial)
+  scene.add(box)
+
+  // 创建创景雾- 线性雾
+  scene.fog = new THREE.Fog(0x999999, 0.1, 50)
+  // 创建创景雾- 指数雾
+  scene.fog = new THREE.FogExp2(0x999999, 0.15)
+  scene.background = new THREE.Color(0x999999)
 
 
-  // 创建纹理加载器
-  const textureLoader = new THREE.TextureLoader();
-  // 加载纹理
-  const texture = textureLoader.load('/textures/Material_2068.webp');
-
-  // 设置纹理的彩色空间
-  texture.colorSpace = THREE.SRGBColorSpace
-  // texture.colorSpace = THREE.LinearSRGBColorSpace
-  // texture.colorSpace = THREE.NoColorSpace  (默认线性空间)
-
-  // 加载ao 环境遮挡贴图
-  const aoTexture = textureLoader.load('/textures/Material_2073.webp');
-
-  // 加载透明度贴图
-  const  alphaMap =  textureLoader.load('/textures/Material_2078.webp');
-
-  // 加载光照贴图
-  const lightMap = textureLoader.load('/textures/Material_2088.webp');
-
-
-  // 加载高光贴图
-  const specularMap = textureLoader.load('/textures/Material_2088.webp');
-
-  const rgbeLoader = new RGBELoader()
-  rgbeLoader.load('/textures/small_empty_room_1_1k.hdr', (envMap)=>{
-    // 设置球形映射
-    envMap.mapping = THREE.EquirectangularReflectionMapping
-    // 设置环境贴图
-    scene.background = envMap
-    // 给场景plane设置环境贴图
-    planeMaterial.envMap = envMap
-  })
-
-
-  const planeGeometry = new THREE.PlaneGeometry( 1, 1 );
-  const planeMaterial = new THREE.MeshBasicMaterial( {
-    color: 0xffffff,
-    transparent: true,
-    map: texture,
-    aoMap: aoTexture,
-    alphaMap: alphaMap,
-    specularMap: specularMap
-    // lightMap:lightMap,
-    // reflectivity:0.1 // 反射强度
-  } );
-  const plane = new THREE.Mesh( planeGeometry, planeMaterial );
-  scene.add( plane );
-
-  gui.add(planeMaterial, 'aoMapIntensity').min(0).max(1).name('ao强度')
-
-  gui.add(texture, 'colorSpace',{
-    sRGB: THREE.SRGBColorSpace,
-    Linear: THREE.LinearSRGBColorSpace
-  }).onChange(()=>{
-    texture.needsUpdate = true
-  })
 })
 
 
