@@ -6,6 +6,8 @@ import * as THREE from 'three';
 import { OrbitControls} from "three/examples/jsm/controls/OrbitControls";
 // 导入GUI
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
+// 引入HDR加载器
+import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js'
 
 
 onMounted (()=>{
@@ -94,12 +96,37 @@ onMounted (()=>{
   // 加载ao 环境遮挡贴图
   const aoTexture = textureLoader.load('/textures/Material_2073.webp');
 
+  // 加载透明度贴图
+  const  alphaMap =  textureLoader.load('/textures/Material_2078.webp');
+
+  // 加载光照贴图
+  const lightMap = textureLoader.load('/textures/Material_2088.webp');
+
+
+  // 加载高光贴图
+  const specularMap = textureLoader.load('/textures/Material_2088.webp');
+
+  const rgbeLoader = new RGBELoader()
+  rgbeLoader.load('/textures/small_empty_room_1_1k.hdr', (envMap)=>{
+    // 设置球形映射
+    envMap.mapping = THREE.EquirectangularReflectionMapping
+    // 设置环境贴图
+    scene.background = envMap
+    // 给场景plane设置环境贴图
+    planeMaterial.envMap = envMap
+  })
+
+
   const planeGeometry = new THREE.PlaneGeometry( 1, 1 );
   const planeMaterial = new THREE.MeshBasicMaterial( {
     color: 0xffffff,
     transparent: true,
     map: texture,
-    aoMap: aoTexture
+    aoMap: aoTexture,
+    alphaMap: alphaMap,
+    specularMap: specularMap
+    // lightMap:lightMap,
+    // reflectivity:0.1 // 反射强度
   } );
   const plane = new THREE.Mesh( planeGeometry, planeMaterial );
   scene.add( plane );
