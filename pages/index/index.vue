@@ -6,9 +6,10 @@ import * as THREE from 'three';
 import { OrbitControls} from "three/examples/jsm/controls/OrbitControls";
 // 导入GUI
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
-// 引入HDR加载器
-import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js'
-
+// 导入gltf加载器
+import { GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
+import {RGBELoader} from "three/examples/jsm/loaders/RGBELoader.js";
+import {DRACOLoader} from "three/examples/jsm/loaders/DRACOLoader";
 
 onMounted (()=>{
   // 创建场景
@@ -43,9 +44,9 @@ onMounted (()=>{
 
 
   // 设置相机位置
-  camera.position.z = 12;
-  camera.position.x = 2
-  camera.position.y = 2
+  camera.position.z = 10;
+  camera.position.x = 0
+  camera.position.y = 0
   camera.lookAt(0,0,0)
 
   // 渲染场景
@@ -86,18 +87,36 @@ onMounted (()=>{
   // 添加按钮
   gui.add(eventObj, 'FullScreen').name('全屏')
   gui.add(eventObj, 'ExitFullScreen').name('退出全屏')
-  // 创建长方体
-  const boxGeometry = new THREE.BoxGeometry(1,1,100)
-  const boxMeterial = new THREE.MeshBasicMaterial({color: 0x00ff00})
-  const box = new THREE.Mesh(boxGeometry, boxMeterial)
-  scene.add(box)
 
-  // 创建创景雾- 线性雾
-  scene.fog = new THREE.Fog(0x999999, 0.1, 50)
-  // 创建创景雾- 指数雾
-  scene.fog = new THREE.FogExp2(0x999999, 0.15)
-  scene.background = new THREE.Color(0x999999)
 
+  // 实例化加载器gltf
+  const gltfLoader = new GLTFLoader()
+  gltfLoader.load('/textures/tiny_city_4k.glb', (gltf)=>{
+    console.log("%c ---> gltf: ","color:#F0F;", gltf);
+    scene.add(gltf.scene)
+    // scene.background = new THREE.Color(0x999999)
+  })
+
+  // // 实例化解析器
+  // const dracoLoader = new DRACOLoader()
+  // dracoLoader.setDecoderPath('./draco/')
+  //
+  // gltfLoader.setDRACOLoader(dracoLoader)
+  //
+  gltfLoader.load('/textures/雕塑11 (1).gltf', (gltf)=>{
+    console.log("%c ---> gltf: ","color:#F0F;", gltf);
+    scene.add(gltf.scene)
+    // scene.background = new THREE.Color(0x999999)
+  })
+
+  // 加载环境贴图
+  const rgbeLoader = new RGBELoader()
+  rgbeLoader.load('/textures/small_empty_room_1_1k.hdr', (envMap)=>{
+    // 球面的全景图映射
+    envMap.mapping = THREE.EquirectangularReflectionMapping
+    // 设置环境贴图
+    scene.environment = envMap
+  })
 
 })
 
